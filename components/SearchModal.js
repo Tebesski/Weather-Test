@@ -23,6 +23,8 @@ export default function SearchModal({
    handleSearch,
    errorMessage,
    setErrorMessage,
+   setSelectedCountryCode,
+   handleSearchPress,
 }) {
    const [countries, setCountries] = useState([])
    const [cities, setCities] = useState([])
@@ -49,12 +51,15 @@ export default function SearchModal({
    }, [selectedCountry, countries])
 
    useEffect(() => {
-      if (cities.data) {
+      if (cities.data?.length > 0) {
+         console.log(cities.data)
          setFilteredCities(
             cities.data.filter((city) =>
                city.toLowerCase().includes(selectedCity.toLowerCase())
             )
          )
+      } else {
+         setFilteredCities([])
       }
    }, [selectedCity, cities])
 
@@ -70,6 +75,9 @@ export default function SearchModal({
       if (selectedCountry) {
          getCities(selectedCountry.toLowerCase())
             .then((data) => {
+               if (data.error) {
+                  setCities([])
+               }
                setCities(data)
             })
             .catch((err) => {
@@ -81,24 +89,30 @@ export default function SearchModal({
    const CountryPicker = ({
       selectedCountry,
       setSelectedCountry,
+      setSelectedCountryCode,
       countries,
    }) => {
       return (
          <Picker
             selectedValue={selectedCountry}
-            onValueChange={(itemValue) => setSelectedCountry(itemValue)}
+            onValueChange={(itemValue, itemIndex) => {
+               setSelectedCountry(itemValue)
+               setSelectedCountryCode(countries[itemIndex].cca2)
+            }}
             style={{ top: -25 }}
          >
-            {countries.map((item, index) => (
-               <Picker.Item
-                  enabled={false}
-                  key={item.cca3 || index}
-                  label={`${item.flag || ""} ${
-                     item.name ? item.name.common : item
-                  }`}
-                  value={item.name.common || item}
-               />
-            ))}
+            {countries
+               .sort((a, b) => a.name.common.localeCompare(b.name.common))
+               .map((item, index) => (
+                  <Picker.Item
+                     enabled={false}
+                     key={item.cca3 || index}
+                     label={`${item.flag || ""} ${
+                        item.name ? item.name.common : item
+                     }`}
+                     value={item.name.common || item}
+                  />
+               ))}
          </Picker>
       )
    }
@@ -107,10 +121,12 @@ export default function SearchModal({
       return (
          <Picker
             selectedValue={selectedCity}
-            onValueChange={(itemValue) => setSelectedCity(itemValue)}
+            onValueChange={(itemValue) => {
+               setSelectedCity(itemValue)
+            }}
             style={{ top: -25 }}
          >
-            {filteredCities.map((item, index) => (
+            {filteredCities.sort().map((item, index) => (
                <Picker.Item key={index} label={item} value={item} />
             ))}
          </Picker>
@@ -202,6 +218,7 @@ export default function SearchModal({
                         selectedCountry={selectedCountry}
                         setSelectedCountry={setSelectedCountry}
                         countries={filteredCountries}
+                        setSelectedCountryCode={setSelectedCountryCode}
                      />
                   )}
                   {selectedInput === "city" && (
@@ -237,7 +254,7 @@ export default function SearchModal({
                            setErrorMessage(null)
                         }, 2000)
                      } else {
-                        handleSearch()
+                        handleSearchPress()
                      }
                   }}
                >

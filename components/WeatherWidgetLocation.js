@@ -1,10 +1,12 @@
 import { useContext, useEffect, useState } from "react"
 import { View, Text, StyleSheet } from "react-native"
 import { WeatherContext } from "../context/WeatherContext"
+import { SearchContext } from "../context/SearchContext"
 
 export default function WeatherWidgetLocation() {
    const { currentLocation, currentTime, isLoading } =
       useContext(WeatherContext)
+   const { selectedCity } = useContext(SearchContext)
    const themeStyles = currentTime === "night" ? darkStyles : styles
 
    const [locationString, setLocationString] = useState("")
@@ -14,12 +16,7 @@ export default function WeatherWidgetLocation() {
 
    useEffect(() => {
       if (currentLocation?.address && !isLoading) {
-         const location =
-            currentLocation.address?.city ||
-            currentLocation.address?.state_district ||
-            currentLocation.address?.state ||
-            currentLocation.address?.suburb ||
-            currentLocation.address.country
+         const location = currentLocation.address?.city || selectedCity
          setLocationString(location)
          const country = currentLocation.address.country
          setCountryString(country)

@@ -6,8 +6,7 @@ import moment from "moment-timezone"
 export const WeatherContext = createContext()
 
 export const WeatherProvider = ({ children }) => {
-   const { selectedCityLat, selectedCityLon, DEFAULT_LAT, DEFAULT_LON } =
-      useContext(SearchContext)
+   const { selectedCityLat, selectedCityLon } = useContext(SearchContext)
    const [isLoading, setIsLoading] = useState(true)
    const [weatherData, setWeatherData] = useState(null)
    const [forecastData, setForecastData] = useState(null)
@@ -24,8 +23,8 @@ export const WeatherProvider = ({ children }) => {
 
    useEffect(() => {
       setIsLoading(true)
-      const lat = selectedCityLat || DEFAULT_LAT
-      const lon = selectedCityLon || DEFAULT_LON
+      const lat = selectedCityLat || process.env.DEFAULT_LAT
+      const lon = selectedCityLon || process.env.DEFAULT_LON
       getWeatherData("metric", lat, lon)
          .then((data) => {
             setForecastData(data)
@@ -53,8 +52,8 @@ export const WeatherProvider = ({ children }) => {
          }
          getLocationName(
             setIsLoading,
-            DEFAULT_LAT,
-            DEFAULT_LON,
+            process.env.DEFAULT_LAT,
+            process.env.DEFAULT_LON,
             setCurrentLocation
          )
          setCurrentTime(getTimeOfDay(weatherData))

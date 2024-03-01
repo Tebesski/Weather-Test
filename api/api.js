@@ -43,10 +43,10 @@ export async function getLocationName(lat, lon) {
    }
 }
 
-export async function getCurrentLocation(query) {
+export async function getCurrentLocation(city, country) {
    try {
       const response = await fetch(
-         `${process.env.EXPO_PUBLIC_LOCATION_SEARCH_API_URL}?key=${process.env.EXPO_PUBLIC_LOCATION_API_KEY}&q=${query}&format=json`
+         `${process.env.EXPO_PUBLIC_LOCATION_SEARCH_API_URL}q=${city},,${country}&limit=5&appid=${process.env.EXPO_PUBLIC_WEATHER_API_KEY}`
       )
       const data = await response.json()
       return data

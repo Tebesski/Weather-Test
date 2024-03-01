@@ -9,12 +9,11 @@ import AsyncStorage from "@react-native-async-storage/async-storage"
 export const SearchContext = createContext("", "")
 
 export const SearchProvider = ({ children }) => {
-   const DEFAULT_LAT = "33"
-   const DEFAULT_LON = "22"
    const [isModalVisible, setModalVisible] = useState(false)
 
    const [selectedCountry, setSelectedCountry] = useState("")
    const [selectedCity, setSelectedCity] = useState("")
+   const [selectedCountryCode, setSelectedCountryCode] = useState("")
 
    const [selectedCityLat, setSelectedCityLat] = useState("")
    const [selectedCityLon, setSelectedCityLon] = useState("")
@@ -25,8 +24,8 @@ export const SearchProvider = ({ children }) => {
 
    useEffect(() => {
       const fetchUserLocation = async () => {
-         let lat = await AsyncStorage.getItem("latitude")
-         let lon = await AsyncStorage.getItem("longitude")
+         const lat = await AsyncStorage.getItem("latitude")
+         const lon = await AsyncStorage.getItem("longitude")
 
          if (lat && lon) {
             setSelectedCityLat(lat)
@@ -36,13 +35,13 @@ export const SearchProvider = ({ children }) => {
             let { status } = await Location.requestForegroundPermissionsAsync()
             if (status !== "granted") {
                console.error("Permission to access location was denied")
-               setSelectedCityLat(DEFAULT_LAT)
-               setSelectedCityLon(DEFAULT_LON)
+               setSelectedCityLat(process.env.DEFAULT_LAT)
+               setSelectedCityLon(process.env.DEFAULT_LON)
                setIsLoading(false)
                return
             }
 
-            let location = await Location.getCurrentPositionAsync({})
+            let location = await Location.getLastKnownPositionAsync({})
             setSelectedCityLat(location.coords.latitude.toString())
             setSelectedCityLon(location.coords.longitude.toString())
             setIsLoading(false)
@@ -66,14 +65,35 @@ export const SearchProvider = ({ children }) => {
    }
 
    const handleSearch = () => {
-      if (selectedCity) {
-         getCurrentLocation(selectedCity).then((data) => {
-            setSelectedCityLat(data[0].lat)
-            setSelectedCityLon(data[0].lon)
+      if (selectedCity && selectedCountry) {
+         getCurrentLocation(selectedCity, selectedCountry).then((data) => {
+            const city = data.find(
+               (item) => item.country === selectedCountryCode
+            )
+
+            if (city?.length > 0) {
+               console.log(city)
+               setSelectedCityLat(city[0].lat)
+               setSelectedCityLon(city[0].lon)
+            } else {
+               setSelectedCityLat(data[0].lat)
+               setSelectedCityLon(data[0].lon)
+            }
          })
       }
       setModalVisible(false)
       Keyboard.dismiss()
+   }
+
+   const handleSearchPress = () => {
+      if (selectedCountry && selectedCountryCode) {
+         handleSearch()
+      } else {
+         setSelectedCountryCode((currentCountryCode) => {
+            handleSearch()
+            return currentCountryCode
+         })
+      }
    }
 
    return (
@@ -87,10 +107,11 @@ export const SearchProvider = ({ children }) => {
             setSelectedCity,
             setSelectedCountry,
             handleSearch,
-            DEFAULT_LAT,
-            DEFAULT_LON,
             setErrorMessage,
             errorMessage,
+            setSelectedCountryCode,
+            selectedCountryCode,
+            handleSearchPress,
          }}
       >
          {isLoading ? (
@@ -104,12 +125,15 @@ export const SearchProvider = ({ children }) => {
                   isModalVisible={isModalVisible}
                   setModalVisible={setModalVisible}
                   handleSearch={handleSearch}
-                  setSelectedCity={setSelectedCity}
-                  setSelectedCountry={setSelectedCountry}
+                  handleSearchPress={handleSearchPress}
                   selectedCountry={selectedCountry}
+                  setSelectedCountry={setSelectedCountry}
                   selectedCity={selectedCity}
+                  setSelectedCity={setSelectedCity}
                   errorMessage={errorMessage}
                   setErrorMessage={setErrorMessage}
+                  setSelectedCountryCode={setSelectedCountryCode}
+                  selectedCountryCode={selectedCountryCode}
                />
             </>
          )}
