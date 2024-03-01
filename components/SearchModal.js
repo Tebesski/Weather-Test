@@ -100,7 +100,9 @@ export default function SearchModal({
                setSelectedCountryCode(countries[itemIndex].cca2)
             }}
             style={{ top: -25 }}
+            label="Select a country"
          >
+            <Picker.Item label="" value="" />
             {countries
                .sort((a, b) => a.name.common.localeCompare(b.name.common))
                .map((item, index) => (
@@ -125,6 +127,7 @@ export default function SearchModal({
             }}
             style={{ top: -25 }}
          >
+            <Picker.Item label="" value="" />
             {filteredCities.sort().map((item, index) => (
                <Picker.Item key={index} label={item} value={item} />
             ))}
@@ -139,7 +142,9 @@ export default function SearchModal({
       return input
    }
 
-   const inputsOrder = ["country", "city"]
+   // const inputsOrder = ["country", "city"]
+   const inputsOrder =
+      selectedInput === "city" ? ["city", "country"] : ["country", "city"]
 
    return (
       <Modal
@@ -330,6 +335,7 @@ const styles = StyleSheet.create({
    modalContainer: {
       ...Platform.select({
          ios: {
+            top: -100,
             width: "80%",
             backgroundColor: "lightblue",
             justifyContent: "flex-start",
@@ -387,41 +393,7 @@ const styles = StyleSheet.create({
       marginBottom: 25,
       fontWeight: "bold",
    },
-   pickerTitleStyle: {
-      justifyContent: "center",
-      flexDirection: "row",
-      alignSelf: "center",
-      fontWeight: "bold",
-   },
-   pickerStyle: {
-      height: 54,
-      width: 150,
-      marginVertical: 10,
-      borderColor: "#303030",
-      alignItems: "center",
-      marginHorizontal: 10,
-      padding: 10,
-      backgroundColor: "white",
-      borderRadius: 5,
-      borderWidth: 2,
-      fontSize: 16,
-      color: "#000",
-   },
-   selectedCountryTextStyle: {
-      paddingLeft: 5,
-      color: "#000",
-      textAlign: "right",
-   },
 
-   countryNameTextStyle: {
-      paddingLeft: 10,
-      color: "#000",
-      textAlign: "right",
-   },
-
-   searchBarStyle: {
-      flex: 1,
-   },
    checkWeatherButton: {
       backgroundColor: "cyan",
       borderRadius: 15,

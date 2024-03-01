@@ -26,10 +26,13 @@ export default function WeatherWidgetLocation() {
       return (
          <View style={styles.weatherWidgetLocationContainer}>
             <View style={{ alignItems: "center" }}>
-               <Text style={styles.loadingText}>
+               <Text style={themeStyles.loadingText}>
                   Taking a moment to find your city ;)
                </Text>
-               <ActivityIndicator size="small" color="black" />
+               <ActivityIndicator
+                  size="small"
+                  color={currentTime === "night" ? "white" : "black"}
+               />
             </View>
          </View>
       )
@@ -64,8 +67,6 @@ const styles = StyleSheet.create({
    loadingText: {
       alignSelf: "center",
       fontSize: 18,
-      // paddingLeft: 10,
-      // paddingRight: 10,
    },
 })
 
@@ -81,5 +82,10 @@ const darkStyles = StyleSheet.create({
       opacity: 0.7,
       color: "white",
       marginRight: 5,
+   },
+   loadingText: {
+      alignSelf: "center",
+      fontSize: 18,
+      color: "white",
    },
 })
