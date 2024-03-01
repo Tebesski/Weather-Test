@@ -2,49 +2,53 @@ import { View, Text, StyleSheet } from "react-native"
 import { useContext, useEffect, useState } from "react"
 import IconI from "react-native-vector-icons/Ionicons"
 import { WeatherContext } from "../context/WeatherContext"
+import { SearchContext } from "../context/SearchContext"
 
 export default function DateWidget() {
    const [time, setTime] = useState(new Date())
-   const { weatherData, currentTime } = useContext(WeatherContext)
+   const { weatherData, currentTime, isLoading } = useContext(WeatherContext)
+   const { isLoading: searchIsLoading } = useContext(SearchContext)
    const themeStyles = currentTime === "night" ? darkStyles : styles
 
-   const date = new Date(
-      (weatherData.current.dt + weatherData.timezone_offset) * 1000
-   )
+   let date, day, dayNumber, formattedTime
+   if (weatherData) {
+      date = new Date(
+         (weatherData.current.dt + weatherData.timezone_offset) * 1000
+      )
+
+      day = new Intl.DateTimeFormat("default", {
+         weekday: "short",
+         timeZone: "UTC",
+      }).format(date)
+
+      dayNumber = date.getUTCDate()
+
+      formattedTime = `${time.getUTCHours().toString().padStart(2, "0")}:${time
+         .getUTCMinutes()
+         .toString()
+         .padStart(2, "0")}:${time.getUTCSeconds().toString().padStart(2, "0")}`
+   }
 
    useEffect(() => {
-      const updateTime = () => {
-         const currentTimeInSeconds = Math.floor(Date.now() / 1000)
-         const localTimeInSeconds =
-            currentTimeInSeconds + weatherData.timezone_offset
-         setTime(new Date(localTimeInSeconds * 1000))
+      if (weatherData) {
+         const updateTime = () => {
+            const currentTimeInSeconds = Math.floor(Date.now() / 1000)
+            const localTimeInSeconds =
+               currentTimeInSeconds + weatherData.timezone_offset
+            setTime(new Date(localTimeInSeconds * 1000))
+         }
+
+         updateTime()
+
+         const timer = setInterval(updateTime, 1000)
+
+         return () => {
+            clearInterval(timer)
+         }
       }
+   }, [weatherData?.timezone_offset])
 
-      updateTime()
-
-      const timer = setInterval(updateTime, 1000)
-
-      return () => {
-         clearInterval(timer)
-      }
-   }, [weatherData.timezone_offset])
-
-   const day = new Intl.DateTimeFormat("default", {
-      weekday: "short",
-      timeZone: "UTC",
-   }).format(date)
-
-   const dayNumber = date.getUTCDate()
-
-   const formattedTime = `${time
-      .getUTCHours()
-      .toString()
-      .padStart(2, "0")}:${time
-      .getUTCMinutes()
-      .toString()
-      .padStart(2, "0")}:${time.getUTCSeconds().toString().padStart(2, "0")}`
-
-   return (
+   return weatherData ? (
       <View style={styles.dateWidgetContainer}>
          <View style={styles.dateWidgetCombo}>
             <IconI
@@ -65,7 +69,7 @@ export default function DateWidget() {
             <Text style={themeStyles.dateWidgetDay}>{formattedTime}</Text>
          </View>
       </View>
-   )
+   ) : null
 }
 
 const styles = StyleSheet.create({

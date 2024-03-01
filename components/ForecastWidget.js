@@ -2,9 +2,12 @@ import { useContext } from "react"
 import { StyleSheet, View, Text, FlatList, SafeAreaView } from "react-native"
 import { WeatherContext } from "../context/WeatherContext"
 import WeatherStatusImage from "./WeatherStatusImage"
+import { SearchContext } from "../context/SearchContext"
 
 export default function ForecastWidget() {
-   const { units, currentTime, forecastData } = useContext(WeatherContext)
+   const { units, currentTime, forecastData, isLoading } =
+      useContext(WeatherContext)
+   const { isLoading: searchIsLoading } = useContext(SearchContext)
    const themeStyles = currentTime === "day" ? styles : darkStyles
 
    const DATA = forecastData
@@ -28,7 +31,7 @@ export default function ForecastWidget() {
    const Item = ({ day, temp, weather, forecast, styles }) => {
       const isLongDescription = weather.description.length > 14
 
-      return (
+      return isLoading || searchIsLoading ? null : (
          <View style={themeStyles.item}>
             <WeatherStatusImage forecastData={forecast} isForecast={true} />
             <Text

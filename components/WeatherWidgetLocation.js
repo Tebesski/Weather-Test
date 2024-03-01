@@ -1,18 +1,17 @@
 import { useContext, useEffect, useState } from "react"
-import { View, Text, StyleSheet } from "react-native"
+import { View, Text, StyleSheet, ActivityIndicator } from "react-native"
 import { WeatherContext } from "../context/WeatherContext"
 import { SearchContext } from "../context/SearchContext"
 
 export default function WeatherWidgetLocation() {
    const { currentLocation, currentTime, isLoading } =
       useContext(WeatherContext)
-   const { selectedCity } = useContext(SearchContext)
+   const { selectedCity, userLocation, userLocationAccess } =
+      useContext(SearchContext)
    const themeStyles = currentTime === "night" ? darkStyles : styles
 
    const [locationString, setLocationString] = useState("")
    const [countryString, setCountryString] = useState("")
-
-   if (isLoading) return <Text>Loading...</Text>
 
    useEffect(() => {
       if (currentLocation?.address && !isLoading) {
@@ -22,6 +21,19 @@ export default function WeatherWidgetLocation() {
          setCountryString(country)
       }
    }, [currentLocation])
+
+   if (userLocationAccess && !userLocation) {
+      return (
+         <View style={styles.weatherWidgetLocationContainer}>
+            <View style={{ alignItems: "center" }}>
+               <Text style={styles.loadingText}>
+                  Taking a moment to find your city ;)
+               </Text>
+               <ActivityIndicator size="small" color="black" />
+            </View>
+         </View>
+      )
+   }
 
    return (
       <View style={styles.weatherWidgetLocationContainer}>
@@ -48,6 +60,12 @@ const styles = StyleSheet.create({
       opacity: 0.7,
       color: "#113547",
       marginRight: 5,
+   },
+   loadingText: {
+      alignSelf: "center",
+      fontSize: 18,
+      // paddingLeft: 10,
+      // paddingRight: 10,
    },
 })
 

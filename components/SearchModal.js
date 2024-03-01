@@ -20,7 +20,6 @@ export default function SearchModal({
    setSelectedCountry,
    selectedCity,
    setSelectedCity,
-   handleSearch,
    errorMessage,
    setErrorMessage,
    setSelectedCountryCode,
@@ -52,7 +51,6 @@ export default function SearchModal({
 
    useEffect(() => {
       if (cities.data?.length > 0) {
-         console.log(cities.data)
          setFilteredCities(
             cities.data.filter((city) =>
                city.toLowerCase().includes(selectedCity.toLowerCase())
@@ -67,7 +65,7 @@ export default function SearchModal({
       getCountries()
          .then((data) => setCountries(data))
          .catch((err) => {
-            console.error(err)
+            console.error("Error getting countries in SearchModal", err)
          })
    }, [])
 
@@ -81,7 +79,7 @@ export default function SearchModal({
                setCities(data)
             })
             .catch((err) => {
-               console.error("getCities", err)
+               console.error("Error gettingCities in SearchModal", err)
             })
       }
    }, [selectedCountry])

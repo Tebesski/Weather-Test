@@ -1,5 +1,5 @@
 import React, { useState, createContext, useEffect, useContext } from "react"
-import { getWeatherData, getLocationName, getForecastData } from "../api/api"
+import { getWeatherData, getLocationName } from "../api/api"
 import { SearchContext } from "./SearchContext"
 import moment from "moment-timezone"
 
@@ -23,14 +23,16 @@ export const WeatherProvider = ({ children }) => {
 
    useEffect(() => {
       setIsLoading(true)
-      const lat = selectedCityLat || process.env.DEFAULT_LAT
-      const lon = selectedCityLon || process.env.DEFAULT_LON
+      const lat = selectedCityLat || process.env.EXPO_PUBLIC_DEFAULT_LAT
+      const lon = selectedCityLon || process.env.EXPO_PUBLIC_DEFAULT_LAT
       getWeatherData("metric", lat, lon)
          .then((data) => {
             setForecastData(data)
             setWeatherData(data)
          })
-         .catch((error) => console.error(error))
+         .catch((error) =>
+            console.error("Error getting weather data in WeatherContext", error)
+         )
          .finally(() => setIsLoading(false))
    }, [selectedCityLat, selectedCityLon])
 
@@ -41,7 +43,12 @@ export const WeatherProvider = ({ children }) => {
                .then((data) => {
                   setCurrentLocation(data)
                })
-               .catch((error) => console.error(error))
+               .catch((error) =>
+                  console.error(
+                     "Error getting location name in Weather Context",
+                     error
+                  )
+               )
                .finally(() => {
                   setIsLoading(false)
                })
@@ -52,8 +59,8 @@ export const WeatherProvider = ({ children }) => {
          }
          getLocationName(
             setIsLoading,
-            process.env.DEFAULT_LAT,
-            process.env.DEFAULT_LON,
+            process.env.EXPO_PUBLIC_DEFAULT_LAT,
+            process.env.EXPO_PUBLIC_DEFAULT_LAT,
             setCurrentLocation
          )
          setCurrentTime(getTimeOfDay(weatherData))

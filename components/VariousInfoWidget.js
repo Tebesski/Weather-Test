@@ -9,6 +9,10 @@ export default function VariousInfoWidget() {
    const { weatherData, currentTime } = useContext(WeatherContext)
    const themeStyles = currentTime === "night" ? darkStyles : styles
 
+   if (!weatherData) {
+      return null
+   }
+
    function getSunriseOrDusk(time, timezoneOffset) {
       const date = new Date((time + timezoneOffset) * 1000)
       const hours = date.getUTCHours()
@@ -18,7 +22,6 @@ export default function VariousInfoWidget() {
       const sunriseTime = weatherData.current.sunrise // Sunrise time in seconds
       const sunsetTime = weatherData.current.sunset // Sunset time in seconds
 
-      let timeToDisplay
       let iconName
       if (currentTimeInSeconds < sunriseTime) {
          timeToDisplay = new Date(sunriseTime * 1000).toLocaleTimeString()

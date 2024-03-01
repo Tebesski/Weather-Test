@@ -4,31 +4,19 @@ export async function getWeatherData(units, lat, lon) {
          `${process.env.EXPO_PUBLIC_WEATHER_API_URL}lat=${lat}&lon=${lon}&units=${units}&appid=${process.env.EXPO_PUBLIC_WEATHER_API_KEY}`
       )
       if (!response.ok) {
-         throw new Error(`HTTP error! status: ${response.status}`)
+         throw new Error(
+            `HTTP error in getWeatherData! status: ${response.status}`
+         )
       }
       const data = await response.json()
       return data
    } catch (error) {
       console.error(
-         "There was a problem with the fetch operation: " + error.message
+         "There was a problem with the fetch operation in getWeatherData: " +
+            error.message
       )
       throw error
    }
-}
-
-export async function getForecastData(
-   setIsLoading,
-   setForecastData,
-   units,
-   lat,
-   lon
-) {
-   setIsLoading(true)
-   const response = await fetch(
-      `${process.env.EXPO_PUBLIC_WEATHER_API_URL}lat=${lat}&lon=${lon}&units=${units}&appid=${process.env.EXPO_PUBLIC_WEATHER_API_KEY}`
-   )
-   const data = await response.json()
-   setForecastData(data)
 }
 
 export async function getLocationName(lat, lon) {
@@ -39,7 +27,7 @@ export async function getLocationName(lat, lon) {
       const data = await response.json()
       return data
    } catch (error) {
-      console.error("getLocationName", error)
+      console.error("getLocationName Error", error)
    }
 }
 
@@ -51,7 +39,7 @@ export async function getCurrentLocation(city, country) {
       const data = await response.json()
       return data
    } catch (error) {
-      console.error("getCurrentLocation", error)
+      console.error("getCurrentLocation Error", error)
    }
 }
 
@@ -82,6 +70,6 @@ export const getCities = async (country) => {
       const data = await response.json()
       return data
    } catch (error) {
-      console.error("getCities", error)
+      console.error("getCities ERROR", error)
    }
 }

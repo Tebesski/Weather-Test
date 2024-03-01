@@ -2,9 +2,11 @@ import { useContext } from "react"
 import { Image, StyleSheet } from "react-native"
 
 import { WeatherContext } from "../context/WeatherContext"
+import { SearchContext } from "../context/SearchContext"
 
 export default function WeatherStatusImage({ forecastData, isForecast }) {
-   const { weatherData, currentTime } = useContext(WeatherContext)
+   const { weatherData, currentTime, isLoading } = useContext(WeatherContext)
+   const { isLoading: searchIsLoading } = useContext(SearchContext)
 
    const images = {
       day: require("../assets/animated/day.gif"),
@@ -25,6 +27,7 @@ export default function WeatherStatusImage({ forecastData, isForecast }) {
    }
 
    const getWeatherCondition = () => {
+      if (!weatherData) return null
       switch (weatherData.current.weather[0].main) {
          case "Clear":
             return images[`${currentTime}`]
@@ -70,6 +73,8 @@ export default function WeatherStatusImage({ forecastData, isForecast }) {
          style={forecastStyles.statusImage}
          source={{ uri: forecastCondition }}
       />
+   ) : isLoading || searchIsLoading ? (
+      <ActivityIndicator size="large" />
    ) : (
       <Image style={styles.statusImage} source={weatherCondition} />
    )

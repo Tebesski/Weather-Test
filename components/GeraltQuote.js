@@ -1,6 +1,7 @@
 import { useContext } from "react"
 import { StyleSheet, View, Text } from "react-native"
 import { WeatherContext } from "../context/WeatherContext"
+import { SearchContext } from "../context/SearchContext"
 
 const geraltQuotes = {
    Clear: ["Sky's clear now. But for how long?"],
@@ -37,8 +38,13 @@ const geraltQuotes = {
 }
 
 export default function GeraltQuote() {
-   const { weatherData, currentTime } = useContext(WeatherContext)
+   const { weatherData, currentTime, isLoading } = useContext(WeatherContext)
+   const { isLoading: searchIsLoading } = useContext(SearchContext)
    const themeStyles = currentTime === "day" ? styles : darkStyles
+
+   if (!weatherData) {
+      return null
+   }
 
    const getQuote = () => {
       if (

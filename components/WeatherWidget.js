@@ -1,5 +1,5 @@
 import { useContext } from "react"
-import { StyleSheet, View, Text } from "react-native"
+import { StyleSheet, View, ActivityIndicator } from "react-native"
 import WeatherStatusImage from "./WeatherStatusImage"
 import WeatherWidgetLocation from "./WeatherWidgetLocation"
 import WeatherTempUnits from "./WeatherTempUnits"
@@ -7,12 +7,14 @@ import VariousInfoWidget from "./VariousInfoWidget"
 import DateWidget from "./DateWidget"
 import { WeatherContext } from "../context/WeatherContext"
 import GeraltQuote from "./GeraltQuote"
+import { SearchContext } from "../context/SearchContext"
 
 export default function WeatherWidget() {
    const { isLoading } = useContext(WeatherContext)
+   const { isLoading: searchIsLoading } = useContext(SearchContext)
 
-   return isLoading ? (
-      <Text>"Loading..."</Text>
+   return isLoading || searchIsLoading ? (
+      <ActivityIndicator size="large" />
    ) : (
       <View style={styles.weatherWidgetContainer}>
          <View style={styles.weatherA}>

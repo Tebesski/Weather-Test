@@ -1,10 +1,8 @@
 import { createContext, useState, useEffect } from "react"
-import { View, Text } from "react-native"
 import SearchModal from "../components/SearchModal"
 import { Keyboard } from "react-native"
 import { getCurrentLocation } from "../api/api"
 import * as Location from "expo-location"
-import AsyncStorage from "@react-native-async-storage/async-storage"
 
 export const SearchContext = createContext("", "")
 
@@ -15,6 +13,9 @@ export const SearchProvider = ({ children }) => {
    const [selectedCity, setSelectedCity] = useState("")
    const [selectedCountryCode, setSelectedCountryCode] = useState("")
 
+   const [userLocationAccess, setUserLocationAccess] = useState()
+   const [userLocation, setUserLocation] = useState(null)
+
    const [selectedCityLat, setSelectedCityLat] = useState("")
    const [selectedCityLon, setSelectedCityLon] = useState("")
 
@@ -24,37 +25,22 @@ export const SearchProvider = ({ children }) => {
 
    useEffect(() => {
       const fetchUserLocation = async () => {
-         const lat = await AsyncStorage.getItem("latitude")
-         const lon = await AsyncStorage.getItem("longitude")
-
-         if (lat && lon) {
-            setSelectedCityLat(lat)
-            setSelectedCityLon(lon)
+         let { status } = await Location.requestForegroundPermissionsAsync()
+         if (status !== "granted") {
+            setUserLocationAccess(false)
+            console.error("Permission to access location was denied")
+            setSelectedCityLat(process.env.EXPO_PUBLIC_DEFAULT_LAT)
+            setSelectedCityLon(process.env.EXPO_PUBLIC_DEFAULT_LON)
             setIsLoading(false)
-         } else {
-            let { status } = await Location.requestForegroundPermissionsAsync()
-            if (status !== "granted") {
-               console.error("Permission to access location was denied")
-               setSelectedCityLat(process.env.DEFAULT_LAT)
-               setSelectedCityLon(process.env.DEFAULT_LON)
-               setIsLoading(false)
-               return
-            }
-
-            let location = await Location.getLastKnownPositionAsync({})
-            setSelectedCityLat(location.coords.latitude.toString())
-            setSelectedCityLon(location.coords.longitude.toString())
-            setIsLoading(false)
-
-            AsyncStorage.setItem(
-               "latitude",
-               location.coords.latitude.toString()
-            )
-            AsyncStorage.setItem(
-               "longitude",
-               location.coords.longitude.toString()
-            )
+            return
          }
+
+         setUserLocationAccess(true)
+         let location = await Location.getCurrentPositionAsync({})
+         setUserLocation(location)
+         setSelectedCityLat(location.coords.latitude.toString())
+         setSelectedCityLon(location.coords.longitude.toString())
+         setIsLoading(false)
       }
 
       fetchUserLocation()
@@ -72,7 +58,6 @@ export const SearchProvider = ({ children }) => {
             )
 
             if (city?.length > 0) {
-               console.log(city)
                setSelectedCityLat(city[0].lat)
                setSelectedCityLon(city[0].lon)
             } else {
@@ -112,13 +97,11 @@ export const SearchProvider = ({ children }) => {
             setSelectedCountryCode,
             selectedCountryCode,
             handleSearchPress,
+            userLocation,
+            userLocationAccess,
          }}
       >
-         {isLoading ? (
-            <View>
-               <Text style={{ color: "gray" }}>Loading...</Text>
-            </View>
-         ) : (
+         {
             <>
                {children}
                <SearchModal
@@ -136,7 +119,7 @@ export const SearchProvider = ({ children }) => {
                   selectedCountryCode={selectedCountryCode}
                />
             </>
-         )}
+         }
       </SearchContext.Provider>
    )
 }

@@ -1,4 +1,4 @@
-import { useContext, useState } from "react"
+import { useContext } from "react"
 import { Text, StyleSheet, TouchableOpacity, View } from "react-native"
 import { WeatherContext } from "../context/WeatherContext"
 
@@ -10,6 +10,10 @@ export default function WeatherTempUnits() {
 
    function setCurrentUnits() {
       units === "metric" ? setUnits("imperial") : setUnits("metric")
+   }
+
+   if (!weatherData) {
+      return null
    }
 
    return (

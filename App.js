@@ -1,5 +1,5 @@
 import { useContext } from "react"
-import { StyleSheet, Text, View } from "react-native"
+import { StyleSheet, View } from "react-native"
 
 import SearchWeather from "./components/SearchWeather"
 import WeatherWidget from "./components/WeatherWidget"
@@ -9,10 +9,10 @@ import { WeatherContext, WeatherProvider } from "./context/WeatherContext"
 import { SearchProvider } from "./context/SearchContext"
 
 function MainApp() {
-   const { currentTime, isLoading } = useContext(WeatherContext)
+   const { currentTime } = useContext(WeatherContext)
    const themeStyles = currentTime === "day" ? styles : darkStyles
 
-   return isLoading ? null : (
+   return (
       <View style={themeStyles.appContainer}>
          <SearchWeather />
          <WeatherWidget />
