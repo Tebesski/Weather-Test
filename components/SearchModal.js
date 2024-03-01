@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react"
+
 import {
    View,
    Text,
@@ -6,6 +7,7 @@ import {
    SafeAreaView,
    TextInput,
    TouchableOpacity,
+   Platform,
 } from "react-native"
 import Modal from "react-native-modal"
 import IconF from "react-native-vector-icons/Feather"
@@ -103,7 +105,6 @@ export default function SearchModal({
                .sort((a, b) => a.name.common.localeCompare(b.name.common))
                .map((item, index) => (
                   <Picker.Item
-                     enabled={false}
                      key={item.cca3 || index}
                      label={`${item.flag || ""} ${
                         item.name ? item.name.common : item
@@ -276,13 +277,28 @@ export default function SearchModal({
 
 const styles = StyleSheet.create({
    overlay: {
-      position: "absolute",
-      top: "43%",
-      left: 0,
-      right: 0,
-      bottom: 0,
-      zIndex: 1,
-      backgroundColor: "white",
+      ...Platform.select({
+         ios: {
+            position: "absolute",
+            top: 195,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            zIndex: 1,
+            backgroundColor: "white",
+         },
+         android: {
+            position: "absolute",
+            top: 200,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            zIndex: 1,
+            backgroundColor: "white",
+            paddingTop: 10,
+            height: 113, // Adjust this value as needed
+         },
+      }),
    },
    centeredView: {
       flex: 1,
@@ -312,12 +328,23 @@ const styles = StyleSheet.create({
       alignItems: "center",
    },
    modalContainer: {
-      width: "80%",
-      height: "50%",
-      backgroundColor: "lightblue",
-      justifyContent: "flex-start",
-      alignItems: "center",
-      opacity: 0.8,
+      ...Platform.select({
+         ios: {
+            width: "80%",
+            backgroundColor: "lightblue",
+            justifyContent: "flex-start",
+            alignItems: "center",
+            opacity: 0.8,
+         },
+         android: {
+            width: "80%",
+            height: 300, // Adjust this value as needed
+            backgroundColor: "lightblue",
+            justifyContent: "flex-start",
+            alignItems: "center",
+            opacity: 1,
+         },
+      }),
    },
    modalText: {
       fontSize: 24,

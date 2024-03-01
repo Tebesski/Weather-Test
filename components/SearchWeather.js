@@ -42,7 +42,6 @@ const styles = StyleSheet.create({
    },
 
    searchButtonContainer: {
-      elevation: 8,
       backgroundColor: "transparent",
       borderRadius: 10,
       paddingVertical: 10,
@@ -70,7 +69,6 @@ const darkStyles = StyleSheet.create({
       color: "white",
    },
    searchButtonContainer: {
-      elevation: 8,
       backgroundColor: "transparent",
       borderRadius: 10,
       paddingVertical: 10,
